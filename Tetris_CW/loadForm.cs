@@ -15,28 +15,28 @@ namespace Tetris_CW
     {
         public Form mform;
         public DataGridView grd;
-        public string saveDir = @"C:\Users\dimak\Documents\Tetris\Saves\";
-        public string saveEx = ".txt";
+        //public string saveDir = @"C:\Users\dimak\Documents\Tetris\Saves\";
+        public string saveEx = ".sv";
         public loadForm(Form mainForm, DataGridView dt)
         {
             InitializeComponent();
             mform = mainForm;
             grd = dt;
             string[] savesF;
-            if (!Directory.Exists(saveDir))
+            if (!Directory.Exists(Form1.saveDir))
             {
-                Directory.CreateDirectory(saveDir);
+                Directory.CreateDirectory(Form1.saveDir);
             }
             else
             {
-                savesF = new string[Directory.GetFiles(saveDir).Length];
-                for (int i = 0; i < Directory.GetFiles(saveDir).Length; i++)
+                savesF = new string[Directory.GetFiles(Form1.saveDir).Length];
+                for (int i = 0; i < Directory.GetFiles(Form1.saveDir).Length; i++)
                 {
-                    DirectoryInfo dir = new DirectoryInfo(saveDir);
+                    DirectoryInfo dir = new DirectoryInfo(Form1.saveDir);
                     string time = dir.GetFileSystemInfos()[i].CreationTime.ToShortDateString();
                     time = time + "\t" + dir.GetFileSystemInfos()[i].CreationTime.ToShortTimeString();
-                    savesF[i] = Directory.GetFiles(saveDir)[i].ToString();
-                    listBox1.Items.Add(savesF[i].Split('\\')[savesF[i].Split('\\').Length-1].Split('.')[0] + "\t" + time);
+                    savesF[i] = Directory.GetFiles(Form1.saveDir)[i].ToString();
+                    listBox1.Items.Add(savesF[i].Split('\\')[savesF[i].Split('\\').Length-1].Split('.')[0] + "\t\t" + time);
                     
                     
                 }
@@ -44,10 +44,10 @@ namespace Tetris_CW
             }
             
         }
-
+        //Кнопка для загрузки сохранения
         private void button1_Click(object sender, EventArgs e)
         {
-            FileStream temp = File.Open(saveDir + listBox1.SelectedItem.ToString().Split('\t')[0] + saveEx, FileMode.OpenOrCreate, FileAccess.Read);
+            FileStream temp = File.Open(Form1.saveDir + "\\" + listBox1.SelectedItem.ToString().Split('\t')[0] + saveEx, FileMode.OpenOrCreate, FileAccess.Read);
             StreamReader strr = new StreamReader(temp);
             string s;
             string[] sTemp;
@@ -57,17 +57,28 @@ namespace Tetris_CW
                 
                 s = strr.ReadLine();
                 sTemp = s.Split('\t');
+                
                 for (int i = 0; i < sTemp.Length-1; i++)
                 {
-                    if (sTemp[i]=="B")
+                    if ((i > 13))
                     {
-                        grd.Rows[j].Cells[i].Style.BackColor = Color.Black;
+                        Form1.tX = int.Parse(sTemp[sTemp.Length - 5]);
+                        Form1.tY = int.Parse(sTemp[sTemp.Length - 4]);
+                        Form1.currentFigure = sTemp[sTemp.Length - 3];
+                        Engine.R = int.Parse(sTemp[sTemp.Length - 2]);
                     }
                     else
                     {
-                        grd.Rows[j].Cells[i].Style.BackColor = Color.White;
+                        if (sTemp[i] == "B")
+                        {
+                            grd.Rows[j].Cells[i].Style.BackColor = Color.Black;
+                        }
+                        else
+                        {
+                            grd.Rows[j].Cells[i].Style.BackColor = Color.White;
+                        }
+
                     }
-                    
                 }
                 j++;
             }
@@ -75,19 +86,45 @@ namespace Tetris_CW
             temp.Close();
             this.Close();
         }
-
+        //Кнопка для удаления сохранения
         private void button2_Click(object sender, EventArgs e)
         {
             //listBox1.SelectedItem.Delete();
-            File.Delete(saveDir + listBox1.SelectedItem.ToString().Split('\t')[0] + saveEx);
-            listBox1.Items.Remove(listBox1.SelectedIndex);
-            listBox1.Update();
+            File.Delete(Form1.saveDir + "\\" + listBox1.SelectedItem.ToString().Split('\t')[0] + saveEx);
+            listBox1.Items.RemoveAt(listBox1.SelectedIndex);
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
             //listBox1.SelectedItem.ToString();
             this.Close();
+        }
+
+        private void browseButton_Click(object sender, EventArgs e)
+        {
+            if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
+            {
+                Form1.saveDir = folderBrowserDialog1.SelectedPath + "\\";
+                listBox1.Items.Clear();
+                string[] savesF;
+                if (!Directory.Exists(Form1.saveDir))
+                {
+                    Directory.CreateDirectory(Form1.saveDir);
+                }
+                else
+                {
+                    savesF = new string[Directory.GetFiles(Form1.saveDir).Length];
+                    for (int i = 0; i < Directory.GetFiles(Form1.saveDir).Length; i++)
+                    {
+                        DirectoryInfo dir = new DirectoryInfo(Form1.saveDir);
+                        string time = dir.GetFileSystemInfos()[i].CreationTime.ToShortDateString();
+                        time = time + "\t" + dir.GetFileSystemInfos()[i].CreationTime.ToShortTimeString();
+                        savesF[i] = Directory.GetFiles(Form1.saveDir)[i].ToString();
+                        listBox1.Items.Add(savesF[i].Split('\\')[savesF[i].Split('\\').Length - 1].Split('.')[0] + "\t\t" + time);
+                    }
+                }
+                Engine.detectSaveDir(true);
+            }
         }
     }
 }

@@ -65,6 +65,7 @@
             this.loadButton = new System.Windows.Forms.Button();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.newGameButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -369,13 +370,13 @@
             this.label2.Text = "Score:";
             // 
             // scoreLabel
-            //
+            // 
             this.scoreLabel.AutoSize = true;
             this.scoreLabel.Location = new System.Drawing.Point(335, 193);
             this.scoreLabel.Name = "scoreLabel";
             this.scoreLabel.Size = new System.Drawing.Size(13, 13);
             this.scoreLabel.TabIndex = 18;
-            this.scoreLabel.Text = "0"; 
+            this.scoreLabel.Text = "0";
             // 
             // saveButton
             // 
@@ -401,11 +402,22 @@
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
+            // newGameButton
+            // 
+            this.newGameButton.Location = new System.Drawing.Point(271, 14);
+            this.newGameButton.Name = "newGameButton";
+            this.newGameButton.Size = new System.Drawing.Size(120, 23);
+            this.newGameButton.TabIndex = 21;
+            this.newGameButton.Text = "New Game";
+            this.newGameButton.UseVisualStyleBackColor = true;
+            this.newGameButton.Click += new System.EventHandler(this.newGameButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(392, 452);
+            this.Controls.Add(this.newGameButton);
             this.Controls.Add(this.loadButton);
             this.Controls.Add(this.saveButton);
             this.Controls.Add(this.scoreLabel);
@@ -478,6 +490,7 @@
         private System.Windows.Forms.Button loadButton;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
+        private System.Windows.Forms.Button newGameButton;
     }
 }
 

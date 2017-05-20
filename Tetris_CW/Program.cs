@@ -12,7 +12,7 @@ namespace Tetris_CW
         /// <summary>
         /// Главная точка входа для приложения.
         /// </summary>
-        [MTAThread]
+        [STAThread]
         static void Main()
         {
             

@@ -23,12 +23,12 @@ namespace Tetris_CW
         #region Variables
         public bool started = false;    //Флаг для определения, была ли запущена игра
         public bool paused = false;     //Флаг для определения, была ли игра  поставлена на пузу
-        public int r = 0;               //Переменная для хранения кода ориентации фигуры
+        public static int r = 0;        //Переменная для хранения кода ориентации фигуры
         public int startX = 0;          // |Переменные для хранения 
         public int startY = 3;          // |стартовой позиции фигур
-        public int tX = 0;              // |Переменные для хранения 
-        public int tY = 3;              // |текущей позиции фигур
-        public string currentFigure = "square";     // Переменная для хранения текущей фигуры
+        public static int tX = 0;              // |Переменные для хранения 
+        public static int tY = 3;              // |текущей позиции фигур
+        public static string currentFigure = "square";     // Переменная для хранения текущей фигуры
         public string tempFigure;                   // Переменная для хранения слеующей фигуры
         public int score;                           // Переменная для хранения счёта
         public static Figures game = new Figures(); // Создание объекта фигур
@@ -37,8 +37,8 @@ namespace Tetris_CW
         public Thread tickerThread;                 // Создание нового фонового потока
         public int savesCount = 0;
         public Structure[] lst;
-        public string saveDir = @"C:\Users\dimak\Documents\Tetris\Saves\";
-        public string saveEx = ".txt";
+        public static string saveDir;
+        public string saveEx = ".sv";
         #endregion
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -48,8 +48,9 @@ namespace Tetris_CW
                 dataGridView1.Rows.Add();
             }
             dataGridView1.ClearSelection();
-            eng = new Engine(game, dataGridView1,r);
+            eng = new Engine(game, dataGridView1,r, scoreLabel);
             eng.resetGrid();
+            Engine.detectSaveDir(false);
             currentFigure = eng.changeFigure();
             tempFigure = eng.changeFigure();            
         }
@@ -63,7 +64,7 @@ namespace Tetris_CW
                 if (!paused)
                 {
                     tickerThread.Start();
-                    eng.Draw(startX, startY, currentFigure);
+                    eng.Draw(tX, tY, currentFigure);
                     started = true;
                     paused = false;
                     play.Refresh();
@@ -104,7 +105,7 @@ namespace Tetris_CW
             eng.MoveDown(tX++, tY, currentFigure);
         }
 
-        //#trash
+        #region trash
         private void Form1_KeyPress(object sender, KeyPressEventArgs e)
         {
             
@@ -114,9 +115,9 @@ namespace Tetris_CW
         {
            
         }
-        //#endoftrash
+        #endregion
 
-        
+
         //Обработчик нажатий клавиш
         private void dataGridView1_KeyDown(object sender, KeyEventArgs e)
         {
@@ -272,7 +273,7 @@ namespace Tetris_CW
             {
                 Directory.CreateDirectory(saveDir);
             }
-            FileStream temp = File.OpenWrite(saveDir + "Save_" + q + saveEx);
+            FileStream temp = File.OpenWrite(saveDir + @"Save_" + q + saveEx);
             StreamWriter str = new StreamWriter(temp);
             for (int i = 0; i < dataGridView1.Rows.Count; i++)
             {
@@ -288,6 +289,10 @@ namespace Tetris_CW
                     }
                     
                 }
+                if (i==0)
+                {
+                    str.Write(tX + "\t" + tY + "\t" + currentFigure + "\t" + Engine.R + "\t");
+                }
                 if (i != dataGridView1.Rows.Count - 1)
                 {
                     str.WriteLine();
@@ -302,8 +307,16 @@ namespace Tetris_CW
         //Кнопка для загрузки сохранения из файла
         private void loadButton_Click(object sender, EventArgs e)
         {
-            loadForm loadF = new loadForm(this,dataGridView1);
+
+            loadForm loadF = new loadForm(this, dataGridView1);
             loadF.Show();
+        }
+
+        private void newGameButton_Click(object sender, EventArgs e)
+        {
+            eng.resetGrid();
+            tX = startX-1;
+            tY = startY;
         }
     }
 }

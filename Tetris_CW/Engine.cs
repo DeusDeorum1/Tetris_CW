@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Threading;
+using Microsoft.Win32;
 
 namespace Tetris_CW
 {
@@ -12,14 +14,16 @@ namespace Tetris_CW
     {
         public Figures fg;
         public DataGridView grd;
-        public int R;
+        public static int R;
+        public Label scoreL;
 
         //Конструктор
-        public Engine(Figures  game, DataGridView a, int r)
+        public Engine(Figures  game, DataGridView a, int r, Label sL)
         {
             fg = game;
             grd = a;
             R = r;
+            scoreL = sL;
         }
         //Проверка возможности сдвинуть фигуру
         public bool checkMove(int x, int y, string figure, string direction)
@@ -516,8 +520,6 @@ namespace Tetris_CW
             }
             return f;
         }
-
-        
         //Определение ориентации фигуры
         public string rotationDetect()
         {
@@ -783,6 +785,7 @@ namespace Tetris_CW
                 for (int j = 0; j < 14; j++)
                 {
                     grd.Rows[i].Cells[j].Style.BackColor = Color.White;
+                    grd.Rows[i].Cells[j].Value = "";
                 }
             }
         }
@@ -792,7 +795,7 @@ namespace Tetris_CW
             bool f;
             bool found = false;
             int scr = 0;
-            int index = 1;
+            int index = 10;
             for (int i = 0; i < 17; i++)
             {
                 f = true;
@@ -825,8 +828,49 @@ namespace Tetris_CW
                     }
                     
                 }
+                if (index <= 1)
+                {
+                    for (int q = 4; q < 10; q++)
+                    {
+                        grd.Rows[7].Cells[q].Style.BackColor = Color.Aquamarine;
+                    }
+                    grd.Rows[7].Cells[4].Value = "L";
+                    grd.Rows[7].Cells[5].Value = "O";
+                    grd.Rows[7].Cells[6].Value = "O";
+                    grd.Rows[7].Cells[7].Value = "S";
+                    grd.Rows[7].Cells[8].Value = "E";
+                    grd.Rows[7].Cells[9].Value = "R";
+                    Thread.Sleep(1500);
+                    resetGrid();
+                }
             }
             return scr;
+        }
+        //Поиск информации по папке сохранений в реестре и доабвление таковой, если её нет
+        public static void detectSaveDir(bool refresh)
+        {
+            RegistryKey currUser = Registry.CurrentUser;
+            RegistryKey soft = currUser.OpenSubKey("Software",true);
+            RegistryKey tetrisApp = soft.CreateSubKey("MyTetris");
+            if (!refresh)
+            {
+                if (tetrisApp.GetValue("saveDir") == null)
+                {
+                    tetrisApp.SetValue("saveDir", @"C:\Users\dimak\Documents\Tetris\Saves\");
+                    Form1.saveDir = @"C:\Users\dimak\Documents\Tetris\Saves\";
+                }
+                else
+                {
+                    Form1.saveDir = tetrisApp.GetValue("saveDir").ToString();
+                }
+            }
+            else
+            {
+                tetrisApp.SetValue("saveDir", Form1.saveDir);
+            }
+            tetrisApp.Close();
+            soft.Close();
+            currUser.Close();
         }
     }
 }
