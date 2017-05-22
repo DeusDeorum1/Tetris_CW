@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tetris_CW", "Tetris_CW\Tetris_CW.csproj", "{AFD63696-9ED6-41C0-B87A-650EAA992AAB}"
 EndProject
 Global
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -15,6 +18,7 @@ Global
 		{AFD63696-9ED6-41C0-B87A-650EAA992AAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFD63696-9ED6-41C0-B87A-650EAA992AAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFD63696-9ED6-41C0-B87A-650EAA992AAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFD63696-9ED6-41C0-B87A-650EAA992AAB}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

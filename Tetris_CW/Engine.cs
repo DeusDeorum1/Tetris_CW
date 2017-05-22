@@ -7,6 +7,8 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.Threading;
 using Microsoft.Win32;
+using System.Xml.Serialization;
+using System.IO;
 
 namespace Tetris_CW
 {
@@ -16,7 +18,6 @@ namespace Tetris_CW
         public DataGridView grd;
         public static int R;
         public Label scoreL;
-
         //Конструктор
         public Engine(Figures  game, DataGridView a, int r, Label sL)
         {
@@ -713,6 +714,60 @@ namespace Tetris_CW
                     break;
             }
         }
+        public void chngRotation(int x, int y, string figure, bool abort)
+        {
+            switch (figure)
+            {
+                case "hat":
+                    fg.hat(x, y, grd, rotationDetect(), Color.White);
+                    break;
+                case "stripe":
+                    fg.stripe(x, y, grd, rotationDetect(), Color.White);
+                    break;
+                case "sapog":
+                    fg.sapog(x, y, grd, rotationDetect(), Color.White);
+                    break;
+                case "square":
+                    fg.square(x, y, grd, rotationDetect(), Color.White);
+                    break;
+                default:
+                    break;
+            }
+            switch (R)
+            {
+                case 0:
+                    R = 3;
+                    break;
+                case 1:
+                    R--;
+                    break;
+                case 2:
+                    R--;
+                    break;
+                case 3:
+                    R--;
+                    break;
+                default:
+                    break;
+            }
+            switch (figure)
+            {
+                case "hat":
+                    fg.hat(x, y, grd, rotationDetect(), Color.Black);
+                    break;
+                case "stripe":
+                    fg.stripe(x, y, grd, rotationDetect(), Color.Black);
+                    break;
+                case "sapog":
+                    fg.sapog(x, y, grd, rotationDetect(), Color.Black);
+                    break;
+                case "square":
+                    fg.square(x, y, grd, rotationDetect(), Color.Black);
+                    break;
+                default:
+                    break;
+            }
+        }
         //Смена фигуры
         public string changeFigure()
         {
@@ -799,10 +854,10 @@ namespace Tetris_CW
             for (int i = 0; i < 17; i++)
             {
                 f = true;
-                
+
                 for (int j = 0; j < 14; j++)
                 {
-                    if ((grd.Rows[i].Cells[j].Style.BackColor == Color.Black)&&(!found))
+                    if ((grd.Rows[i].Cells[j].Style.BackColor == Color.Black) && (!found))
                     {
                         index = i;
                         found = true;
@@ -819,30 +874,32 @@ namespace Tetris_CW
                     {
                         grd.Rows[i].Cells[h].Style.BackColor = Color.White;
                     }
-                    for (int k = i; k > index-1; k--)
+                    for (int k = i; k > index - 1; k--)
                     {
                         for (int h = 0; h < 14; h++)
                         {
                             grd.Rows[k].Cells[h].Style.BackColor = grd.Rows[k - 1].Cells[h].Style.BackColor;
                         }
                     }
-                    
+
                 }
-                if (index <= 1)
+
+            }
+            if (index <= 1)
+            {
+                for (int q = 4; q < 10; q++)
                 {
-                    for (int q = 4; q < 10; q++)
-                    {
-                        grd.Rows[7].Cells[q].Style.BackColor = Color.Aquamarine;
-                    }
-                    grd.Rows[7].Cells[4].Value = "L";
-                    grd.Rows[7].Cells[5].Value = "O";
-                    grd.Rows[7].Cells[6].Value = "O";
-                    grd.Rows[7].Cells[7].Value = "S";
-                    grd.Rows[7].Cells[8].Value = "E";
-                    grd.Rows[7].Cells[9].Value = "R";
-                    Thread.Sleep(1500);
-                    resetGrid();
+                    grd.Rows[7].Cells[q].Style.BackColor = Color.Aquamarine;
                 }
+                grd.Rows[7].Cells[4].Value = "L"; Thread.Sleep(400);
+                grd.Rows[7].Cells[5].Value = "O"; Thread.Sleep(400);
+                grd.Rows[7].Cells[6].Value = "O"; Thread.Sleep(400);
+                grd.Rows[7].Cells[7].Value = "S"; Thread.Sleep(400);
+                grd.Rows[7].Cells[8].Value = "E"; Thread.Sleep(400);
+                grd.Rows[7].Cells[9].Value = "R"; Thread.Sleep(400);
+                Thread.Sleep(4000);
+                resetGrid();
+                updateTable();
             }
             return scr;
         }
@@ -856,8 +913,8 @@ namespace Tetris_CW
             {
                 if (tetrisApp.GetValue("saveDir") == null)
                 {
-                    tetrisApp.SetValue("saveDir", @"C:\Users\dimak\Documents\Tetris\Saves\");
-                    Form1.saveDir = @"C:\Users\dimak\Documents\Tetris\Saves\";
+                    tetrisApp.SetValue("saveDir", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\Tetris\Saves\");
+                    Form1.saveDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)+@"\Tetris\Saves\";
                 }
                 else
                 {
@@ -872,5 +929,110 @@ namespace Tetris_CW
             soft.Close();
             currUser.Close();
         }
+
+        //Поиск информации имени игрока в реестре и доабвление стандартного игрока "Player", если её нет
+        public static void detectCurrPlayers(bool refresh)
+        {
+            RegistryKey currUser = Registry.CurrentUser;
+            RegistryKey soft = currUser.OpenSubKey("Software", true);
+            RegistryKey tetrisApp = soft.CreateSubKey("MyTetris");
+            if (!refresh)
+            {
+                if (tetrisApp.GetValue("playerName") == null)
+                {
+                    tetrisApp.SetValue("playerName", "Player");
+                    Form1.playerName = "Player";
+                }
+                else
+                {
+                    Form1.playerName = tetrisApp.GetValue("playerName").ToString();
+                }
+            }
+            else
+            {
+                tetrisApp.SetValue("playerName", Form1.playerName);
+            }
+            tetrisApp.Close();
+            soft.Close();
+            currUser.Close();
+        }
+        //Метод для сериализации таблицы лидеров
+        public static void serialize()
+        {
+            XmlSerializer xml = new XmlSerializer(typeof(List<Player>));
+            if (!Directory.Exists(Environment.CurrentDirectory + @"\res\"))
+            {
+                Directory.CreateDirectory(Environment.CurrentDirectory + @"\res\");
+            }
+            FileStream writer = new FileStream(Environment.CurrentDirectory + @"\res\table.xml", FileMode.Create);
+            xml.Serialize(writer, leaderboardForm.players);
+            xml = null; 
+            writer.Close();
+        }
+        //Метод для десериализации таблицы лидеров
+        public static void deserialize()
+        {
+            XmlSerializer xml = new XmlSerializer(typeof(List<Player>));
+            if (Directory.Exists(Environment.CurrentDirectory + @"\res\"))
+            {
+                FileStream reader = new FileStream(Environment.CurrentDirectory + @"\res\table.xml", FileMode.OpenOrCreate);
+                leaderboardForm.players = (List<Player>)xml.Deserialize(reader);
+                xml = null;
+                reader.Close();
+            }
+        }
+        //Метод для обновления имени текущего игрока на главной форме 'Form1'
+        public static void updatePlayerName(Form1 form)
+        {
+            form.playerNameLabel.Text = Form1.playerName;
+        }
+        //Метод для обновления информации в таблице лидеров
+        public static void updateTable()
+        {
+            if (leaderboardForm.players.Count() < 7)
+            {
+                leaderboardForm.players.Add(new Player { Name = Form1.playerName, Score = Form1.score });
+                leaderboardForm.players.Sort();
+                leaderboardForm.players.Reverse();
+
+            }
+            else
+            {
+                foreach (Player pl in leaderboardForm.players)
+                {
+                    if (pl.Score < Form1.score)
+                    {
+                        int ind = leaderboardForm.players.FindIndex(x => x.Score == pl.Score);
+                        leaderboardForm.players.Insert(ind, new Player { Name = Form1.playerName, Score = Form1.score });
+                        leaderboardForm.players.RemoveAt(leaderboardForm.players.Count() - 1);
+                        leaderboardForm.players.Sort();
+                        leaderboardForm.players.Reverse();
+                        break;
+                    }
+                }
+            }
+        }
+        /*public static void updateTable(string name)
+        {
+            if (leaderboardForm.players.Count() < 7)
+            {
+                leaderboardForm.players.Add(new Player { Name = name, Score = Form1.score });
+                leaderboardForm.players.Sort();
+            }
+            else
+            {
+                if (leaderboardForm.players.Exists(x => x.Name == Form1.playerName))
+                {
+                    foreach (Player pl in leaderboardForm.players)
+                    {
+                        if (pl)
+                        {
+
+                        }
+                    }
+                    //leaderboardForm.players.FindIndex(,x => x.Name == Form1.playerName)
+                }
+            }
+        }*/
     }
 }

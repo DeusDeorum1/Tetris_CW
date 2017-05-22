@@ -36,9 +36,12 @@ namespace Tetris_CW
                     string time = dir.GetFileSystemInfos()[i].CreationTime.ToShortDateString();
                     time = time + "\t" + dir.GetFileSystemInfos()[i].CreationTime.ToShortTimeString();
                     savesF[i] = Directory.GetFiles(Form1.saveDir)[i].ToString();
-                    listBox1.Items.Add(savesF[i].Split('\\')[savesF[i].Split('\\').Length-1].Split('.')[0] + "\t\t" + time);
-                    
-                    
+                    if (savesF[i].Split('\\')[savesF[i].Split('\\').Length-1].Split('.')[1]=="sv")
+                    {
+                        listBox1.Items.Add(savesF[i].Split('\\')[savesF[i].Split('\\').Length - 1].Split('.')[0] + "\t\t" + time);
+                    }
+
+
                 }
                 
             }
@@ -47,44 +50,47 @@ namespace Tetris_CW
         //Кнопка для загрузки сохранения
         private void button1_Click(object sender, EventArgs e)
         {
-            FileStream temp = File.Open(Form1.saveDir + "\\" + listBox1.SelectedItem.ToString().Split('\t')[0] + saveEx, FileMode.OpenOrCreate, FileAccess.Read);
-            StreamReader strr = new StreamReader(temp);
-            string s;
-            string[] sTemp;
-            int j = 0;
-            while (strr.Peek() > -1)
+            if (listBox1.SelectedItem != null)
             {
-                
-                s = strr.ReadLine();
-                sTemp = s.Split('\t');
-                
-                for (int i = 0; i < sTemp.Length-1; i++)
+                FileStream temp = File.Open(Form1.saveDir + "\\" + listBox1.SelectedItem.ToString().Split('\t')[0] + saveEx, FileMode.OpenOrCreate, FileAccess.Read);
+                StreamReader strr = new StreamReader(temp);
+                string s;
+                string[] sTemp;
+                int j = 0;
+                while (strr.Peek() > -1)
                 {
-                    if ((i > 13))
+
+                    s = strr.ReadLine();
+                    sTemp = s.Split('\t');
+
+                    for (int i = 0; i < sTemp.Length - 1; i++)
                     {
-                        Form1.tX = int.Parse(sTemp[sTemp.Length - 5]);
-                        Form1.tY = int.Parse(sTemp[sTemp.Length - 4]);
-                        Form1.currentFigure = sTemp[sTemp.Length - 3];
-                        Engine.R = int.Parse(sTemp[sTemp.Length - 2]);
-                    }
-                    else
-                    {
-                        if (sTemp[i] == "B")
+                        if ((i > 13))
                         {
-                            grd.Rows[j].Cells[i].Style.BackColor = Color.Black;
+                            Form1.tX = int.Parse(sTemp[sTemp.Length - 5]);
+                            Form1.tY = int.Parse(sTemp[sTemp.Length - 4]);
+                            Form1.currentFigure = sTemp[sTemp.Length - 3];
+                            Engine.R = int.Parse(sTemp[sTemp.Length - 2]);
                         }
                         else
                         {
-                            grd.Rows[j].Cells[i].Style.BackColor = Color.White;
-                        }
+                            if (sTemp[i] == "B")
+                            {
+                                grd.Rows[j].Cells[i].Style.BackColor = Color.Black;
+                            }
+                            else
+                            {
+                                grd.Rows[j].Cells[i].Style.BackColor = Color.White;
+                            }
 
+                        }
                     }
+                    j++;
                 }
-                j++;
+                strr.Close();
+                temp.Close();
+                this.Close();
             }
-            strr.Close();
-            temp.Close();
-            this.Close();
         }
         //Кнопка для удаления сохранения
         private void button2_Click(object sender, EventArgs e)
@@ -120,7 +126,10 @@ namespace Tetris_CW
                         string time = dir.GetFileSystemInfos()[i].CreationTime.ToShortDateString();
                         time = time + "\t" + dir.GetFileSystemInfos()[i].CreationTime.ToShortTimeString();
                         savesF[i] = Directory.GetFiles(Form1.saveDir)[i].ToString();
-                        listBox1.Items.Add(savesF[i].Split('\\')[savesF[i].Split('\\').Length - 1].Split('.')[0] + "\t\t" + time);
+                        if (savesF[i].Split('\\')[savesF[i].Split('\\').Length - 1].Split('.')[1] == "sv")
+                        {
+                            listBox1.Items.Add(savesF[i].Split('\\')[savesF[i].Split('\\').Length - 1].Split('.')[0] + "\t\t" + time);
+                        }
                     }
                 }
                 Engine.detectSaveDir(true);

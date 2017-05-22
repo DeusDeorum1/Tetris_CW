@@ -30,19 +30,21 @@ namespace Tetris_CW
         public static int tY = 3;              // |текущей позиции фигур
         public static string currentFigure = "square";     // Переменная для хранения текущей фигуры
         public string tempFigure;                   // Переменная для хранения слеующей фигуры
-        public int score;                           // Переменная для хранения счёта
+        public static int score;                           // Переменная для хранения счёта
+        public static string playerName;            // Переменная для имени текущего игрока
         public static Figures game = new Figures(); // Создание объекта фигур
         public static Engine eng;                   // | Создание объекта "движка" игры, контролирующего 
                                                     // | изменения игрового поля
         public Thread tickerThread;                 // Создание нового фонового потока
         public int savesCount = 0;
-        public Structure[] lst;
+        public Player[] lst;
         public static string saveDir;
         public string saveEx = ".sv";
         #endregion
         private void Form1_Load(object sender, EventArgs e)
         {
             tickerThread = new Thread(ticker);
+            tickerThread.IsBackground = true;
             for (int i = 0; i < 17; i++)
             {
                 dataGridView1.Rows.Add();
@@ -51,10 +53,12 @@ namespace Tetris_CW
             eng = new Engine(game, dataGridView1,r, scoreLabel);
             eng.resetGrid();
             Engine.detectSaveDir(false);
+            Engine.detectCurrPlayers(false);
+            Engine.deserialize();
+            playerNameLabel.Text = playerName;
             currentFigure = eng.changeFigure();
             tempFigure = eng.changeFigure();            
         }
-
         //Кнопка для запуска/паузы игры
         private void play_Click(object sender, EventArgs e)
         {
@@ -69,6 +73,7 @@ namespace Tetris_CW
                     paused = false;
                     play.Refresh();
                     play.Text = "PAUSE";
+                    dataGridView1.Select();
                     
                 }
                 else
@@ -79,6 +84,7 @@ namespace Tetris_CW
                     play.Refresh();
                     play.Text = "PAUSE";
                     play.Refresh();
+                    dataGridView1.Select();
                 }
                 
             }
@@ -89,10 +95,8 @@ namespace Tetris_CW
                 paused = true;
                 play.Text = "PLAY";
             }
-            
-        }
 
-        
+        }
         //Кнопка для поворота фигуры
         private void button1_Click(object sender, EventArgs e)
         {
@@ -104,7 +108,6 @@ namespace Tetris_CW
         {
             eng.MoveDown(tX++, tY, currentFigure);
         }
-
         #region trash
         private void Form1_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -116,8 +119,6 @@ namespace Tetris_CW
            
         }
         #endregion
-
-
         //Обработчик нажатий клавиш
         private void dataGridView1_KeyDown(object sender, KeyEventArgs e)
         {
@@ -160,8 +161,9 @@ namespace Tetris_CW
                 {
                     eng.chngRotation(tX, tY, currentFigure);
                 }
-                catch
+                catch(Exception)
                 {
+
                 }
             }
             if (e.KeyData == Keys.G)
@@ -174,8 +176,6 @@ namespace Tetris_CW
             }
             
         }
-
-
         #region trash
         private void dataGridView1_CellStyleChanged(object sender, DataGridViewCellEventArgs e)
         {
@@ -194,8 +194,6 @@ namespace Tetris_CW
             //}
         }
         #endregion
-
-
         //метод фонового процесса обновления состояния поля 
         public void ticker()
         {
@@ -216,6 +214,7 @@ namespace Tetris_CW
                         currentFigure = tempFigure;
                         tempFigure = eng.changeFigure();
                         score = score + eng.scoreCount();
+
                     }
                 }
                 catch (Exception)
@@ -231,18 +230,17 @@ namespace Tetris_CW
                     currentFigure = tempFigure;
                     tempFigure = eng.changeFigure();
                     score = score + eng.scoreCount();
+                    //leaderboardForm.players.Add(new Player { Name = playerName, Score = score });
                     //scoreLabel.Text = score.ToString();
                 }
             } while (true);
         }
-
-
         //Кнопка для создания файла сохранения
         private void saveButton_Click(object sender, EventArgs e)
         {
             //C:\Users\dimak\Documents\Tetris\Saves\*.xml
-            /*
-            FileStream saveStream = new FileStream(@"C:\Users\dimak\Documents\Tetris\Saves\save" + savesCount + ".xml", FileMode.Create);
+
+            /*FileStream saveStream = new FileStream(@"C:\Users\dimak\Documents\Tetris\Saves\save" + savesCount + ".xml", FileMode.Create);
             XmlSerializer Ser = new XmlSerializer(typeof(Structure));
             for (int i = 0; i < 17; i++)
             {
@@ -250,8 +248,12 @@ namespace Tetris_CW
                 lst[i] = str;
             }
             Ser.Serialize(saveStream, lst);
-            saveStream.Close();
-            */
+            saveStream.Close();*/
+            if (started)
+            {
+                play.PerformClick();
+            }
+            Engine.updateTable();
             int q = 0;
             if (Directory.Exists(saveDir))
             {
@@ -303,20 +305,45 @@ namespace Tetris_CW
             temp.Close();
             
         }
-    
         //Кнопка для загрузки сохранения из файла
         private void loadButton_Click(object sender, EventArgs e)
         {
-
+            if (started)
+            {
+                play.PerformClick();
+            }
             loadForm loadF = new loadForm(this, dataGridView1);
             loadF.Show();
         }
-
+        //Кнопка для открытия таблицы лидеров
+        private void liderboardButton_Click(object sender, EventArgs e)
+        {
+            if (started)
+            {
+                play.PerformClick();
+            }
+            //Engine.updateTable();
+            leaderboardForm liderF = new leaderboardForm(this);
+            liderF.Show();
+        }
+        //Кнопка для начала новой игры
         private void newGameButton_Click(object sender, EventArgs e)
         {
+            if (started)
+            {
+                play.PerformClick();
+            }
             eng.resetGrid();
-            tX = startX-1;
+            tX = startX;
             tY = startY;
+            Engine.updateTable();
+        }
+        //Сериализация и обновление в реестре информации о последнем игроке
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Engine.updateTable();
+            Engine.serialize();
+            Engine.detectCurrPlayers(true);
         }
     }
 }
