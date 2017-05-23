@@ -124,6 +124,7 @@
     <EmbeddedResource Include="loadForm.resx">
       <DependentUpon>loadForm.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="ClassDiagram1.cd" />
     <None Include="Properties\DataSources\Player.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

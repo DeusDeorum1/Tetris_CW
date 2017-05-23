@@ -57,7 +57,14 @@ namespace Tetris_CW
             Engine.deserialize();
             playerNameLabel.Text = playerName;
             currentFigure = eng.changeFigure();
-            tempFigure = eng.changeFigure();            
+            Thread.Sleep(100);
+            tempFigure = eng.changeFigure();
+            nextFigureGrid.Rows.Add();
+            nextFigureGrid.Rows.Add();
+            nextFigureGrid.Rows.Add();
+            nextFigureGrid.Rows.Add();
+            nextFigureGrid.ClearSelection();
+            //eng.drawNext(nextFigureGrid, tempFigure);
         }
         //Кнопка для запуска/паузы игры
         private void play_Click(object sender, EventArgs e)
@@ -74,7 +81,8 @@ namespace Tetris_CW
                     play.Refresh();
                     play.Text = "PAUSE";
                     dataGridView1.Select();
-                    
+                    eng.drawNext(nextFigureGrid, tempFigure);
+
                 }
                 else
                 {
@@ -85,8 +93,10 @@ namespace Tetris_CW
                     play.Text = "PAUSE";
                     play.Refresh();
                     dataGridView1.Select();
+                    eng.drawNext(nextFigureGrid, tempFigure);
+
                 }
-                
+
             }
             else
             {
@@ -214,7 +224,8 @@ namespace Tetris_CW
                         currentFigure = tempFigure;
                         tempFigure = eng.changeFigure();
                         score = score + eng.scoreCount();
-
+                        this.Invoke(new Action(() => { scoreLabel.Text = score.ToString(); }));
+                        eng.drawNext(nextFigureGrid, tempFigure);
                     }
                 }
                 catch (Exception)
@@ -231,7 +242,8 @@ namespace Tetris_CW
                     tempFigure = eng.changeFigure();
                     score = score + eng.scoreCount();
                     //leaderboardForm.players.Add(new Player { Name = playerName, Score = score });
-                    //scoreLabel.Text = score.ToString();
+                    this.Invoke(new Action(() => { scoreLabel.Text = score.ToString(); }));
+                    eng.drawNext(nextFigureGrid, tempFigure);
                 }
             } while (true);
         }
@@ -337,6 +349,11 @@ namespace Tetris_CW
             tX = startX;
             tY = startY;
             Engine.updateTable();
+            currentFigure = eng.changeFigure();
+            tempFigure = eng.changeFigure();
+            score = 0;
+            scoreLabel.Text = "0";
+
         }
         //Сериализация и обновление в реестре информации о последнем игроке
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)

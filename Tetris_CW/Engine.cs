@@ -18,6 +18,7 @@ namespace Tetris_CW
         public DataGridView grd;
         public static int R;
         public Label scoreL;
+        public Color brush = Color.Black; 
         //Конструктор
         public Engine(Figures  game, DataGridView a, int r, Label sL)
         {
@@ -786,53 +787,33 @@ namespace Tetris_CW
                     return "square";
             }
         }
-        /*drawing next figure
-        public void drawNext(string nextFigure)
+        public void drawNext(DataGridView nfG,string nextFigure)
         {
-            checkBox1.Checked = false;
-            checkBox2.Checked = false;
-            checkBox3.Checked = false;
-            checkBox4.Checked = false;
-            checkBox5.Checked = false;
-            checkBox6.Checked = false;
-            checkBox7.Checked = false;
-            checkBox8.Checked = false;
-            checkBox9.Checked = false;
-            checkBox10.Checked = false;
-            checkBox11.Checked = false;
-            checkBox12.Checked = false;
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    nfG.Rows[j].Cells[i].Style.BackColor = Color.White;
+                }
+            }
             switch (nextFigure)
             {
                 case "hat":
-                    checkBox1.Checked = true;
-                    checkBox2.Checked = true;
-                    checkBox3.Checked = true;
-                    checkBox5.Checked = true;
+                    fg.hat(0, 0, nfG, "Top", brush);
                     break;
                 case "stripe":
-                    checkBox2.Checked = true;
-                    checkBox5.Checked = true;
-                    checkBox8.Checked = true;
-                    checkBox11.Checked = true;
+                    fg.stripe(0, 0, nfG, "Top", brush);
                     break;
                 case "sapog":
-                    checkBox2.Checked = true;
-                    checkBox5.Checked = true;
-                    checkBox8.Checked = true;
-                    checkBox11.Checked = true;
-                    checkBox12.Checked = true;
+                    fg.sapog(0, 0, nfG, "Top", brush);
                     break;
                 case "square":
-                    checkBox5.Checked = true;
-                    checkBox6.Checked = true;
-                    checkBox8.Checked = true;
-                    checkBox9.Checked = true;
-
+                    fg.square(0, 0, nfG, "Top", brush);
                     break;
                 default:
                     break;
             }
-        }*/
+        }
         public void resetGrid()
         {
             for (int i = 0; i < 17; i++)
