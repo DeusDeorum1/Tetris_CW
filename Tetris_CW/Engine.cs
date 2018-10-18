@@ -884,6 +884,24 @@ namespace Tetris_CW
             }
             return scr;
         }
+
+        //Метод для увеличения скорости игры
+        public int addSpeed(bool refresh)
+        {
+            if (refresh)
+            {
+                if (Form1.speed < 200)
+                {
+                    //Form1.speed = Form1.speed - 100;
+                    return (Form1.speed/2);
+                }
+                return Form1.speed;
+            }
+            else
+            {
+                return Form1.speed = 1000;
+            }
+        }
         //Поиск информации по папке сохранений в реестре и доабвление таковой, если её нет
         public static void detectSaveDir(bool refresh)
         {

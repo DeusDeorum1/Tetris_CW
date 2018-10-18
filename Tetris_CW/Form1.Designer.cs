@@ -295,7 +295,7 @@
             this.liderboardButton.Name = "liderboardButton";
             this.liderboardButton.Size = new System.Drawing.Size(120, 23);
             this.liderboardButton.TabIndex = 22;
-            this.liderboardButton.Text = "Liderboard";
+            this.liderboardButton.Text = "Leaderboard";
             this.liderboardButton.UseVisualStyleBackColor = true;
             this.liderboardButton.Click += new System.EventHandler(this.liderboardButton_Click);
             // 
@@ -374,6 +374,7 @@
             this.Controls.Add(this.button1);
             this.Controls.Add(this.dataGridView1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
+            this.HelpButton = true;
             this.Name = "Form1";
             this.Text = "Tetris";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);

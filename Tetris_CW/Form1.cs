@@ -37,6 +37,7 @@ namespace Tetris_CW
                                                     // | изменения игрового поля
         public Thread tickerThread;                 // Создание нового фонового потока
         public int savesCount = 0;
+        public static int speed = 1000;
         public Player[] lst;
         public static string saveDir;
         public string saveEx = ".sv";
@@ -209,7 +210,7 @@ namespace Tetris_CW
         {
             do
             {
-                Thread.Sleep(1000);
+                Thread.Sleep(speed);
                 try
                 {
                     if (eng.checkMove(tX, tY, currentFigure, "down"))
@@ -224,6 +225,7 @@ namespace Tetris_CW
                         currentFigure = tempFigure;
                         tempFigure = eng.changeFigure();
                         score = score + eng.scoreCount();
+                        this.Invoke(new Action(() => { speed = eng.addSpeed(false); }));
                         this.Invoke(new Action(() => { scoreLabel.Text = score.ToString(); }));
                         eng.drawNext(nextFigureGrid, tempFigure);
                     }
@@ -353,7 +355,7 @@ namespace Tetris_CW
             tempFigure = eng.changeFigure();
             score = 0;
             scoreLabel.Text = "0";
-
+            speed = eng.addSpeed(true);
         }
         //Сериализация и обновление в реестре информации о последнем игроке
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
